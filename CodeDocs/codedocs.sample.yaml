@@ -1,0 +1,57 @@
+# codedocs.yaml
+version: 0.1
+sources:
+  - name: Claims.Core
+    # Local folder example
+    root: src/Claims/Claims.Core
+    include: ["**/*.cs", "**/*.sql"]
+    exclude: ["**/*.g.cs", "**/obj/**", "**/bin/**"]
+    sections:
+      - type: region
+        name: "Public API"
+        match: "^#region Public API$"
+      - type: regex
+        name: "DbContext"
+        pattern: "(?s)class\\s+ClaimsDbContext\\b.*?\\n\\}"
+  - name: RemoteRepoExample
+    # Git repo example (optional fields: ref, subDir). If repo is set, files are pulled from it.
+    repo: https://DSCCIT@dev.azure.com/DSCCIT/Claims/_git/Claims
+    ref: master
+    sub_dir: .
+    root: . # still required by schema, ignored when repo is set
+    include: ["**/*.cs", "**/*.sql"]
+    exclude: ["**/obj/**", "**/bin/**"]
+style:
+  preset: "api-deep-dive"
+  tone: "concise"
+  audience: "internal-engineering"
+  include: ["rationale", "examples", "edge-cases"]
+llm:
+  provider: "openai"
+  model: "gpt-4o-mini"
+  max_tokens: 4000
+  temperature: 0.2
+  system_prompt: |
+    You are a senior .NET architect documenting a healthcare claims codebase.
+    Prefer C# examples. Be accurate, terse, and actionable.
+  prompt_template: |
+    Document the following code section according to the style config.
+    - FILE: {{file_path}}
+    - SECTION: {{section_name}}
+    - STYLE: preset={{preset}}, tone={{tone}}, audience={{audience}}, include={{includes}}
+    CODE:
+    ```{{language}}
+    {{code}}
+    ```
+    Produce markdown with:
+    - H1 = file path (relative)
+    - H2 = section name
+    - bullets for responsibilities, dependencies, key flows
+    - examples as C# where applicable
+    - "Gotchas" and "Edge cases" if any
+run:
+  incremental: true
+  parallelism: 4
+  fail_on_unmatched_sections: false
+output:
+  path: "out/docs" # local-only

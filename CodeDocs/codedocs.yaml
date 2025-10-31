@@ -1,0 +1,68 @@
+# codedocs.yaml
+version: 0.1
+sources:
+  - name: ClaimsRepo
+    # Git source
+    repo: https://DSCCIT@dev.azure.com/DSCCIT/Claims/_git/Claims
+    ref: master
+    sub_dir: .
+    root: . # required by schema; ignored when repo is set
+
+    # Only include the target file
+    include:
+      - "Claims.Application/BenefitCalculations/Services/BenefitCalculatorService.cs"
+    exclude:
+      - "**/obj/**"
+      - "**/bin/**"
+
+    # Optional: alias file path -> display title for the H1 header
+    aliases:
+      "Claims.Application/BenefitCalculations/Services/BenefitCalculatorService.cs": "Benefit Calculations"
+
+    # Sections to extract (adjust as needed)
+    sections:
+      - type: regex
+        name: "Class"
+        pattern: "(?s)class\\s+BenefitCalculatorService\\b.*?\\n\\}"
+        context: "Give examples of the different benefit calculations and how they are used along with expected results for each calculation."
+
+
+style:
+  preset: "api-deep-dive"
+  tone: "concise"
+  audience: "internal-engineering"
+  include: ["rationale", "examples", "edge-cases"]
+
+llm:
+  provider: "openai"
+  model: "gpt-4o-mini"
+  max_tokens: 4000
+  temperature: 0.2
+  system_prompt: |
+    You are a senior .NET architect documenting a healthcare claims codebase.
+    Prefer C# examples. Be accurate, terse, and actionable.
+    You are documenting so that a business analyst can understand the code.
+    You are not writing code, you are writing documentation.
+  prompt_template: |
+    Document the following code section according to the style config.
+    - FILE: {{file_path}}
+    - SECTION: {{section_name}}
+    - STYLE: preset={{preset}}, tone={{tone}}, audience={{audience}}, include={{includes}}
+    CODE:
+    ```{{language}}
+    {{code}}
+    ```
+    Produce markdown with:
+    - H1 = file path (relative) or alias when configured
+    - H2 = section name
+    - bullets for responsibilities, dependencies, key flows
+    - examples as C# where applicable
+    - "Gotchas" and "Edge cases" if any
+
+run:
+  incremental: true
+  parallelism: 4
+  fail_on_unmatched_sections: false
+
+output:
+  path: "out/docs"

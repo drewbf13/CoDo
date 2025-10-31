@@ -1,0 +1,24 @@
+############################
+# Build artifacts
+############################
+**/bin/
+**/obj/
+**/out/
+
+############################
+# IDE folders and settings
+############################
+.vs/
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+############################
+# Logs and temp files
+############################
+*.log
+*.tmp
+
+
